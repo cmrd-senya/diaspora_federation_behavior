@@ -1,9 +1,7 @@
 configuration:
   pod1: 
     uri: "http://pod1.diaspora.local"
-    repo: "https://github.com/diaspora/diaspora.git"
-    revisions: [develop]
+    revisions: ["origin/develop"]
   pod2:
     uri: "http://pod2.diaspora.local"
-    repo: "https://github.com/diaspora/diaspora.git"
-    revisions: [develop, stable]
+    revisions: ["origin/develop", "origin/stable"]

@@ -6,7 +6,7 @@ class User
   end
 
   def api_client
-    @client ||= DiasporaApi::Client.new(pod_uri(pod_id))
+    @client ||= DiasporaApi::InternalApi.new(pod_uri(pod_id))
   end
 
   def username

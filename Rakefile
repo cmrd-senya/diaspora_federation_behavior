@@ -36,36 +36,50 @@ def wait_pod_up(pod_nr, timeout=60)
   up
 end
 
-def deploy_app(pod_nr, repo, revision)
-  sh "cd diaspora-replica/capistrano && env REPO_URL='#{repo}' BRANCH=#{revision} SERVER_URL='#{pod_host(pod_nr)}' bundle exec cap test deploy"
+def deploy_app(pod_nr, revision)
+  sh "cd diaspora-replica/capistrano && env BRANCH=#{revision} SERVER_URL='#{pod_host(pod_nr)}' bundle exec cap test deploy"
 end
 
-task :install_vagrant_plugin, :name do |t, args|
-  unless `cd diaspora-replica && vagrant plugin list`.include?(args[:name])
-    sh "cd diaspora-replica && vagrant plugin install #{args[:name]}"
+def install_vagrant_plugin(name)
+  unless `cd diaspora-replica && vagrant plugin list`.include?(name)
+    sh "cd diaspora-replica && vagrant plugin install #{name}"
   end
 end
 
 task :install_vagrant_requirements do
-  Rake::Task[:install_vagrant_plugin].invoke("vagrant-hosts")
-  Rake::Task[:install_vagrant_plugin].invoke("vagrant-group")
+  install_vagrant_plugin("vagrant-hosts")
+  install_vagrant_plugin("vagrant-group")
 end
 
-task :bring_up_testfarm => :install_vagrant_requirements do
+task :check_repository_clone do
+  sh "mkdir -p diaspora-replica/src"
+  `cd diaspora-replica/src && git status`
+  unless $? == 0
+    sh "git clone https://github.com/diaspora/diaspora.git diaspora-replica/src"
+  else
+    sh "cd diaspora-replica/src && git fetch --all"
+  end
+end
+
+task :bring_up_testfarm => %i(install_vagrant_requirements check_repository_clone) do
   if machine_off?("pod1") || machine_off?("pod2")
     sh "cd diaspora-replica && vagrant group up testfarm"
   end
 end
 
 task :deploy_apps => :bring_up_testfarm do
-  deploy_app(1, environment_configuration["pod1"]["repo"], environment_configuration["pod1"]["revisions"].first)
-  deploy_app(2, environment_configuration["pod2"]["repo"], environment_configuration["pod1"]["revisions"].first)
+  deploy_app(1, environment_configuration["pod1"]["revisions"].first)
+  deploy_app(2, environment_configuration["pod1"]["revisions"].first)
 end
 
 task :launch_pods do
-  launch_pod(1)
-  launch_pod(2)
-  puts "Error encountered during pod launch" unless wait_pod_up(1) && wait_pod_up(2)
+  if machine_off?("pod1") || machine_off?("pod2")
+    puts "Required machines are halted! Aborting"
+  else
+    launch_pod(1)
+    launch_pod(2)
+    puts "Error encountered during pod launch" unless wait_pod_up(1) && wait_pod_up(2)
+  end
 end
 
 task :stop_pods do
@@ -75,12 +89,12 @@ end
 
 task :execute_tests => %i(bring_up_testfarm stop_pods) do
   environment_configuration["pod1"]["revisions"].each do |pod1_revision|
-    puts "Deploying revision #{pod1_revision} from #{environment_configuration["pod1"]["repo"]} on pod1"
-    deploy_app(1, environment_configuration["pod1"]["repo"], pod1_revision)
+    puts "Deploying revision #{pod1_revision} on pod1"
+    deploy_app(1, pod1_revision)
     launch_pod(1)
     environment_configuration["pod2"]["revisions"].each do |pod2_revision|
-      puts "Deploying revision #{pod2_revision} from #{environment_configuration["pod2"]["repo"]} on pod2"
-      deploy_app(2, environment_configuration["pod2"]["repo"], pod2_revision)
+      puts "Deploying revision #{pod2_revision} on pod2"
+      deploy_app(2, pod2_revision)
       launch_pod(2)
 
       unless wait_pod_up(1) && wait_pod_up(2)
