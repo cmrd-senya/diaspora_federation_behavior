@@ -1,6 +1,7 @@
 require "spec_helper"
 require "user"
 require "shared_behaviors/adding_to_aspect"
+require "shared_behaviors/sharing_posts"
 
 describe "user sharing feature" do
   def person_0_on_pod1
@@ -35,6 +36,16 @@ describe "user sharing feature" do
     end
 
     it_behaves_like "adding to aspect" do
+      let(:user0) {users[1]}
+      let(:user1) {users[0]}
+    end
+
+    it_behaves_like "sharing posts" do
+      let(:user0) {users[0]}
+      let(:user1) {users[1]}
+    end
+
+    it_behaves_like "sharing posts" do
       let(:user0) {users[1]}
       let(:user1) {users[0]}
     end

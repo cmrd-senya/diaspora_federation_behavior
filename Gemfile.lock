@@ -8,9 +8,10 @@ GIT
 
 GIT
   remote: git://github.com/cmrd-senya/diaspora-api.git
-  revision: 9b74555b610b9d7add4534d0e2ea88688cd47c1a
+  revision: b747f138db3b4e1b601b26ba92b4a1a2a14a26a3
   specs:
     diaspora_api (0.0.6.dev)
+      openid_connect
 
 GEM
   remote: https://rubygems.org/

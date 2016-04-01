@@ -23,11 +23,4 @@ shared_examples_for "adding to aspect" do
     expect(@notifications.count).to be > 0
     expect(@notifications.first["started_sharing"]["target_id"]).to eq(user1.remote_person(user0.diaspora_id)["id"])
   end
-
-#  it "a private post is visible to a friend" do
-#    msg = r_str
-#    resp = user0.post(msg, user0.aspects.first["name"])
-#    expect(resp).to eq("302")
-#    
-#  end
 end
