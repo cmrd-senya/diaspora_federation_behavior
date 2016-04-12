@@ -7,11 +7,27 @@ GIT
       sshkit (~> 1.2)
 
 GIT
+  remote: git://github.com/cmrd-senya/capistrano-db-tasks.git
+  revision: 89ff2f8d59cf14f7c9044e1091c3bb1234d1d413
+  branch: dump_task.2
+  specs:
+    capistrano-db-tasks (0.4)
+      capistrano (>= 3.0.0)
+
+GIT
   remote: git://github.com/cmrd-senya/diaspora-api.git
-  revision: b747f138db3b4e1b601b26ba92b4a1a2a14a26a3
+  revision: 8cd9062f296be244a2c529c0cc04e55877428421
   specs:
     diaspora_api (0.0.6.dev)
       openid_connect
+      valid
+
+GIT
+  remote: git://github.com/zonkeynir/capistrano-rails-collection.git
+  revision: 919929ae447a9376938614ac1c91f83d6a687e0b
+  specs:
+    capistrano-rails-collection (0.0.3)
+      capistrano-rails (~> 1.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -29,8 +45,7 @@ GEM
     attr_required (1.0.1)
     bindata (2.3.0)
     builder (3.2.2)
-    capistrano (3.3.5)
-      capistrano-stats (~> 1.1.0)
+    capistrano (3.4.0)
       i18n
       rake (>= 10.0.0)
       sshkit (~> 1.3)
@@ -40,8 +55,6 @@ GEM
     capistrano-rails (1.1.2)
       capistrano (~> 3.1)
       capistrano-bundler (~> 1.1)
-    capistrano-stats (1.1.1)
-    colorize (0.7.5)
     diff-lcs (1.2.5)
     httpclient (2.7.1)
     i18n (0.7.0)
@@ -59,9 +72,9 @@ GEM
     mime-types-data (3.2016.0221)
     minitest (5.8.4)
     multi_json (1.11.2)
-    net-scp (1.1.2)
+    net-scp (1.2.1)
       net-ssh (>= 2.6.5)
-    net-ssh (3.0.2)
+    net-ssh (3.1.1)
     openid_connect (0.10.0)
       activemodel
       attr_required (>= 1.0.0)
@@ -95,8 +108,7 @@ GEM
       rspec-support (~> 3.4.0)
     rspec-support (3.4.1)
     securecompare (1.0.0)
-    sshkit (1.6.1)
-      colorize (>= 0.7.0)
+    sshkit (1.9.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     swd (1.0.1)
@@ -109,6 +121,7 @@ GEM
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     url_safe_base64 (0.2.2)
+    valid (1.1.0)
     validate_email (0.1.6)
       activemodel (>= 3.0)
       mail (>= 2.2.5)
@@ -125,7 +138,9 @@ PLATFORMS
 
 DEPENDENCIES
   capistrano
+  capistrano-db-tasks!
   capistrano-rails
+  capistrano-rails-collection!
   capistrano-rvm!
   diaspora_api!
   openid_connect

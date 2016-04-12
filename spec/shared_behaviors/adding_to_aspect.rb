@@ -1,26 +1,14 @@
+require "common_expectations"
+
 shared_examples_for "adding to aspect" do
   before do
-    result = user0.api_client.add_to_aspect(
-      user0.remote_person(user1.diaspora_id)["id"],
-      user0.api_client.aspects.first["id"]
-    )
-
-    expect(result).to be_truthy
+    expect(user0.add_to_first_aspect(user1)).to be_truthy
   end
 
   it "two users set up sharing correctly" do
-    10.times do
-      @notifications = user1.api_client.notifications
-      expect(@notifications).not_to be_nil
+    notifications = user1.wait_for_notification("started_sharing")
 
-      @notifications.select! do |notification|
-        notification["started_sharing"]
-      end
-      break if @notifications.count > 0
-      sleep(1)
-    end
-
-    expect(@notifications.count).to be > 0
-    expect(@notifications.first["started_sharing"]["target_id"]).to eq(user1.remote_person(user0.diaspora_id)["id"])
+    expect(notifications.count).to be > 0
+    expect(notifications.first["started_sharing"]["target_id"]).to eq(user1.remote_person(user0.diaspora_id)["id"])
   end
 end

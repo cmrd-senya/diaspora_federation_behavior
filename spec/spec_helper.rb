@@ -24,6 +24,10 @@ def r_str
   SecureRandom.hex(4)
 end
 
+def db_connections
+  @db_connections ||= []
+end
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
@@ -49,6 +53,22 @@ RSpec.configure do |config|
   end
 
   config.example_status_persistence_file_path = ".rspec-persistance"
+
+  config.before(:all) do
+    (1..2).each do |pod_nr|
+      Dir.chdir("diaspora-replica/capistrano") do
+        system "bundle exec env SERVER_URL='#{pod_host(pod_nr)}' cap test db:remote:backup >> ../../log/db-aux.log"
+      end
+    end
+  end
+
+  config.after(:each) do
+    (1..2).each do |pod_nr|
+      Dir.chdir("diaspora-replica/capistrano") do
+        system "bundle exec env SERVER_URL='#{pod_host(pod_nr)}' cap test db:remote:restore_latest >> ../../log/db-aux.log"
+      end
+    end
+  end
 
 # The settings below are suggested to provide a good initial experience
 # with RSpec, but feel free to customize to your heart's content.

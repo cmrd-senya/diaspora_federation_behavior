@@ -1,7 +1,0 @@
-configuration:
-  pod1: 
-    uri: "http://pod1.diaspora.local"
-    revisions: ["origin/develop"]
-  pod2:
-    uri: "http://pod2.diaspora.local"
-    revisions: ["origin/develop", "origin/stable"]
