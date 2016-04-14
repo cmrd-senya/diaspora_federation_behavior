@@ -37,8 +37,10 @@ def deploy_app_revision(pod_nr, revision)
 end
 
 def install_vagrant_plugin(name)
-  unless `cd diaspora-replica && vagrant plugin list`.include?(name)
-    pipesh "cd diaspora-replica && vagrant plugin install #{name}"
+  within_diaspora_replica do
+    unless `vagrant plugin list`.include?(name)
+      pipesh "vagrant plugin install #{name}"
+    end
   end
 end
 
@@ -48,19 +50,21 @@ task :install_vagrant_requirements do
 end
 
 task :check_repository_clone do
-  pipesh "mkdir -p diaspora-replica/src"
-  `cd diaspora-replica/src && git status`
-  unless $? == 0
-    pipesh "git clone https://github.com/diaspora/diaspora.git diaspora-replica/src"
-  else
-    pipesh "cd diaspora-replica/src && git fetch --all"
+  within_diaspora_replica do
+    pipesh "mkdir -p src"
+    `cd src && git status`
+    unless $? == 0
+      pipesh "git clone https://github.com/diaspora/diaspora.git src"
+    else
+      pipesh "cd src && git fetch --all"
+    end
   end
 end
 
 task :bring_up_testfarm => %i(install_vagrant_requirements check_repository_clone) do
   if testenv_off?
     report_info "Bringing up test environment"
-    pipesh "cd diaspora-replica && vagrant group up testfarm"
+    within_diaspora_replica { pipesh "vagrant group up testfarm" }
   end
 end
 
@@ -70,7 +74,7 @@ task :deploy_apps => :bring_up_testfarm do
   end
 end
 
-task :launch_pods do
+task :launch_pods => :bring_up_testfarm do
   if testenv_off?
     logger.info "Required machines are halted! Aborting"
   else
@@ -115,10 +119,18 @@ def deploy_and_launch(pod_nr=1, &f)
   end
 end
 
+task :reset_databases do
+  (1..pod_count).each do |i|
+    within_capistrano do
+      pipesh "bundle exec env SERVER_URL='#{pod_host(i)}' cap test rails:rake:db:drop rails:rake:db:setup diaspora:fixtures:generate_and_load"
+    end
+  end
+end
+
 task :execute_tests => %i(bring_up_testfarm stop_pods) do
   deploy_and_launch do
     report_info "Launching the test suite"
-    if pipesh("bundle exec rake") == 0
+    if pipesh_log_and_stdout("bundle exec rake") == 0
       report_info "Test suite finished correctly"
     else
       report_error "Test suite failed"
@@ -127,7 +139,7 @@ task :execute_tests => %i(bring_up_testfarm stop_pods) do
 end
 
 task :clean do
-  system "cd diaspora-replica && vagrant group destroy testfarm"
+  within_diaspora_replica { system "vagrant group destroy testfarm" }
 end
 
 RSpec::Core::RakeTask.new(:spec)

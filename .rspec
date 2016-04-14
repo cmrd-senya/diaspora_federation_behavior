@@ -1,2 +1,5 @@
+--format Fuubar
+--profile
 --color
---require spec_helper
+--tag ~performance
+--order random
