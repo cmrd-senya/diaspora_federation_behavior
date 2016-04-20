@@ -47,6 +47,8 @@ end
 task :install_vagrant_requirements do
   install_vagrant_plugin("vagrant-hosts")
   install_vagrant_plugin("vagrant-group")
+  install_vagrant_plugin("vagrant-puppet-install")
+  install_vagrant_plugin("vagrant-lxc")
 end
 
 task :check_repository_clone do

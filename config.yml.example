@@ -1,4 +1,5 @@
 configuration:
+  pod_count: 2
   pod1:
     uri: "http://pod1.diaspora.local" # it's optional
     revisions: ["origin/develop"] # it's mandatory
