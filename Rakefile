@@ -67,6 +67,7 @@ task :bring_up_testfarm => %i(install_vagrant_requirements check_repository_clon
   if testenv_off?
     report_info "Bringing up test environment"
     within_diaspora_replica { pipesh "vagrant group up testfarm" }
+    exit 1 unless $? == 0
   end
 end
 
@@ -101,14 +102,17 @@ def deploy_and_launch(pod_nr=1, &f)
   environment_configuration["pod#{pod_nr}"]["revisions"].each do |revision|
     unless deploy_app_revision(pod_nr, revision) == 0
       report_error "Failed to deploy pod#{pod_nr} with revision #{revision}"
+      @failure = true
       next
     end
     unless launch_pod(pod_nr) == 0
       report_error "Failed to launch pod #{pod_nr}"
+      @failure = true
       next
     end
     unless wait_pod_up(pod_uri(pod_nr))
       report_error "Pod #{pod_nr} wasn't up after the launch attempt. Tests won't run."
+      @failure = true
       next
     end
 
@@ -136,8 +140,10 @@ task :execute_tests => %i(bring_up_testfarm stop_pods) do
       report_info "Test suite finished correctly"
     else
       report_error "Test suite failed"
+      @failure = true
     end
   end
+  exit 1 if @failure
 end
 
 task :clean do
