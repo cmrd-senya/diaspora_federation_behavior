@@ -64,6 +64,8 @@ task :check_repository_clone do
 end
 
 task :bring_up_testfarm => %i(install_vagrant_requirements check_repository_clone) do
+  report_info `vagrant --version`
+  report_info `ruby --version`
   if testenv_off?
     report_info "Bringing up test environment"
     within_diaspora_replica { pipesh "vagrant group up testfarm" }

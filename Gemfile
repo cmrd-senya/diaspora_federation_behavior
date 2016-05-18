@@ -9,4 +9,3 @@ gem 'capistrano-rails'
 gem "openid_connect"
 gem 'capistrano-rails-collection', github: "zonkeynir/capistrano-rails-collection"
 gem 'capistrano-db-tasks', github: "cmrd-senya/capistrano-db-tasks", branch: "dump_task.2"
-gem "fuubar"
