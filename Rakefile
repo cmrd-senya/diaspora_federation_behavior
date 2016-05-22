@@ -135,10 +135,10 @@ task :reset_databases do
   end
 end
 
-task :execute_tests => %i(bring_up_testfarm stop_pods) do
+task :execute_tests, [:arg] => %i(bring_up_testfarm stop_pods) do |task, args|
   deploy_and_launch do
     report_info "Launching the test suite"
-    if pipesh_log_and_stdout("bundle exec rake") == 0
+    if pipesh_log_and_stdout("bundle exec rake spec[#{args[:arg]}]") == 0
       report_info "Test suite finished correctly"
     else
       report_error "Test suite failed"
@@ -152,6 +152,8 @@ task :clean do
   within_diaspora_replica { system "vagrant group destroy testfarm" }
 end
 
-RSpec::Core::RakeTask.new(:spec)
+RSpec::Core::RakeTask.new(:spec, :opts) do |t, task_args|
+  t.rspec_opts = "#{task_args[:opts]}"
+end
 
 task :default => :spec

@@ -1,7 +1,7 @@
 require "shared_behaviors/sharing_posts"
 
 shared_examples_for "user rename makes old ID inaccessible" do
-  it "" do
+  it "", upstream: false, rename_feature: true do
     user1_diaspora_id = @user1.api_client.diaspora_id
     expect(@user1.api_client.change_username("ivan", "bluepin7")).to be_truthy
     sleep(2)
@@ -28,7 +28,7 @@ shared_examples_for "user rename makes old ID inaccessible" do
 end
 
 shared_examples_for "user rename updates contact references" do
-  it "" do
+  it "", upstream: false, rename_feature: true do
     # check there is the old user ID in user2's contacts
     expect(@user2.api_client.get_contacts.map { |cnt| cnt["handle"] }).to include(@user1.api_client.diaspora_id)
 
@@ -49,6 +49,8 @@ shared_examples_for "user rename updates contact references" do
 end
 
 shared_examples_for "user still receives posts after changing his name" do
+  metadata.merge!(upstream: false, rename_feature: true)
+
   before do
     expect(@user1.api_client.change_username("ivan", "bluepin7")).to be_truthy
     sleep(2)

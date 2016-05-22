@@ -54,6 +54,9 @@ describe "all the possible relationships of a pair of users communication:" do
     end
 
     context "and with prefetched profile" do
+      metadata.merge!(upstream: false)
+      metadata.merge!(known_federation_bugs: true)
+
       before do
         # prefetch the profile
         expect(@user2.remote_person(@user1.diaspora_id)).not_to be_nil 
