@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/cmrd-senya/diaspora-api.git
-  revision: ef5a0a1cfc39f5ebba2e44bc69959b0209d0bd64
+  revision: 97d1177854acae8cdd60dc690b5680485e1bc3a6
   specs:
     diaspora_api (0.0.6.dev)
       openid_connect

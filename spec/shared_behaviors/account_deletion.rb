@@ -19,7 +19,10 @@ shared_examples_for "user deletion works fine" do
     # try to add user1 to aspects
     @user2.add_to_first_aspect(@user1) # this is allowed to pass in some cases still, but not generally a good thing
 
+    contacts = @user2.api_client.get_contacts
+    expect(contacts).not_to be_nil
+
     # make sure user1 wasn't added to aspects
-    expect(@user2.api_client.get_contacts.map { |cnt| cnt["handle"] }).not_to include(@user1.api_client.diaspora_id)
+    expect(contacts.map { |cnt| cnt["handle"] }).not_to include(@user1.api_client.diaspora_id)
   end
 end
