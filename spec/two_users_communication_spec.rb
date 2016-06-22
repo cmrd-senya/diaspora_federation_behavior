@@ -3,6 +3,7 @@ require "spec_helper"
 require "common_expectations"
 require "shared_behaviors/account_deletion"
 require "shared_behaviors/account_rename"
+require "shared_behaviors/conversation"
 
 describe "all the possible relationships of a pair of users communication:" do
   before do
@@ -20,6 +21,7 @@ describe "all the possible relationships of a pair of users communication:" do
       expect_for_sharing_notification(@user2, @user1)
     end
 
+    it_behaves_like "private and public conversation with a post and comments"
     it_behaves_like "user deletion works fine"
     it_behaves_like "user rename makes old ID inaccessible"
     it_behaves_like "user rename updates contact references"
@@ -30,6 +32,10 @@ describe "all the possible relationships of a pair of users communication:" do
     before do
       @user2.add_to_first_aspect(@user1)
       expect_for_sharing_notification(@user1, @user2)
+    end
+
+    it_behaves_like "conversation with a post and comments" do
+      let(:aspect) { "public" }
     end
 
     it_behaves_like "user deletion works fine"
@@ -43,6 +49,7 @@ describe "all the possible relationships of a pair of users communication:" do
       expect_for_sharing_notification(@user2, @user1)
     end
 
+    it_behaves_like "private and public conversation with a post and comments"
     it_behaves_like "user deletion works fine"
     it_behaves_like "user rename makes old ID inaccessible"
   end
