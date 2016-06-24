@@ -6,11 +6,14 @@ require "shared_behaviors/account_rename"
 require "shared_behaviors/conversation"
 
 describe "all the possible relationships of a pair of users communication:" do
+  metadata.merge!(pod_count: 2)
+
   before do
-    @user1 = User.new(1)
-    expect(@user1.api_client.login("alice", "bluepin7")).to be_truthy
-    @user2 = User.new(2)
-    expect(@user2.api_client.login("alice", "bluepin7")).to be_truthy
+    @user1, @user2 = (1..2).map do |i|
+      user = User.new(i)
+      expect(user.api_client.login("alice", "bluepin7")).to be_truthy
+      user
+    end
   end
 
   context "mutual sharing" do
@@ -21,7 +24,9 @@ describe "all the possible relationships of a pair of users communication:" do
       expect_for_sharing_notification(@user2, @user1)
     end
 
-    it_behaves_like "private and public conversation with a post and comments"
+    it_behaves_like "private and public conversation with a post and comments" do
+      let(:aspect) { @user1.api_client.aspects.first["name"] }
+    end
     it_behaves_like "user deletion works fine"
     it_behaves_like "user rename makes old ID inaccessible"
     it_behaves_like "user rename updates contact references"
@@ -37,7 +42,6 @@ describe "all the possible relationships of a pair of users communication:" do
     it_behaves_like "conversation with a post and comments" do
       let(:aspect) { "public" }
     end
-
     it_behaves_like "user deletion works fine"
     it_behaves_like "user rename makes old ID inaccessible"
     it_behaves_like "user rename updates contact references"
@@ -49,7 +53,9 @@ describe "all the possible relationships of a pair of users communication:" do
       expect_for_sharing_notification(@user2, @user1)
     end
 
-    it_behaves_like "private and public conversation with a post and comments"
+    it_behaves_like "private and public conversation with a post and comments" do
+      let(:aspect) { @user1.api_client.aspects.first["name"] }
+    end
     it_behaves_like "user deletion works fine"
     it_behaves_like "user rename makes old ID inaccessible"
   end

@@ -21,6 +21,7 @@ def launch_pod(pod_nr)
   else
     eye("start", "test", "SERVER_URL='#{pod_host(pod_nr)}'")
   end
+  eye("info", "test", "SERVER_URL='#{pod_host(pod_nr)}'", true)
 end
 
 def stop_pod(pod_nr)
@@ -64,11 +65,12 @@ task :check_repository_clone do
 end
 
 task :bring_up_testfarm => %i(install_vagrant_requirements check_repository_clone) do
+  ENV["pod_count"] = pod_count.to_s
   report_info `vagrant --version`
   report_info `ruby --version`
   if testenv_off?
     report_info "Bringing up test environment"
-    within_diaspora_replica { pipesh "vagrant group up testfarm" }
+    within_diaspora_replica { pipesh "env pod_count=#{pod_count} vagrant group up testfarm" }
     exit 1 unless $? == 0
   end
 end
@@ -149,7 +151,7 @@ task :execute_tests, [:arg] => %i(bring_up_testfarm stop_pods) do |task, args|
 end
 
 task :clean do
-  within_diaspora_replica { system "vagrant group destroy testfarm" }
+  within_diaspora_replica { system "env pod_count=#{pod_count} vagrant group destroy testfarm" }
 end
 
 RSpec::Core::RakeTask.new(:spec, :opts) do |t, task_args|
